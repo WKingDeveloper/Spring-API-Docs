@@ -1,4 +1,4 @@
-package com.example;
+package com.example.apiDoc;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

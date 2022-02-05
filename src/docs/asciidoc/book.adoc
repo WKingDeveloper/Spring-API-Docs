@@ -1,0 +1,10 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== Book
+=== 조회
+==== Request
+include::{snippets}/book/http-request.adoc[]
+==== Response
+include::{snippets}/book/http-response.adoc[]

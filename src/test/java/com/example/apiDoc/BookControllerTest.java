@@ -23,7 +23,6 @@ class BookControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     @Test
     public void getBook() throws Exception {
 
