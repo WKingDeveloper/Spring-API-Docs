@@ -1,21 +1,24 @@
 package com.example.apiDoc;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
 @AutoConfigureRestDocs
 class BookControllerTest {
@@ -26,15 +29,23 @@ class BookControllerTest {
     @Test
     public void getBook() throws Exception {
 
-        // given
-        Long id = 1l;
-        // when
-        ResultActions result = this.mockMvc.perform(get("/book/" + id)
-                        .characterEncoding("utf-8")
-                        .accept(MediaType.APPLICATION_JSON));
-        //then
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andDo(document("book")); // (3)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/book/{id}", 1l)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(document("book", // (3)
+                        pathParameters(
+                                parameterWithName("id").description("book unique id") // (4)
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("book unique id"),
+                                fieldWithPath("title").description("title"),
+                                fieldWithPath("author").description("author")
+                        )
+                ))
+                .andExpect(jsonPath("$.id", (notNullValue()))) // (5)
+                .andExpect(jsonPath("$.title", (notNullValue())))
+                .andExpect(jsonPath("$.author", (notNullValue())));
     }
+
 }
